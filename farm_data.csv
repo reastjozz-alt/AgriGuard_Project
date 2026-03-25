@@ -1,0 +1,7 @@
+Date,Crop,Diagnosis,Status
+2026-03-25,potato,Healthy (Demo),Checked
+2026-03-25,Unknown,Healthy (Scan Successful),Verified
+2026-03-25,Corn,Corn Rust,Verified
+2026-03-25,Potato,Late Blight,Verified
+2026-03-25,Potato,Healthy,Verified
+2026-03-25,Potato,Healthy,Verified

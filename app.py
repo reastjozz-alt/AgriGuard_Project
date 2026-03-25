@@ -21,7 +21,6 @@ CURE_GUIDE = {
 
 # --- 3. IMPROVED AI LOGIC ---
 def predict_disease(crop, image):
-    # Realistic logic based on Crop selected
     results = {
         "Potato": ["Potato Early Blight", "Late Blight", "Healthy"],
         "Tomato": ["Tomato Bacterial Spot", "Healthy"],
@@ -41,7 +40,7 @@ if choice == "AI Scanner":
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        crop = st.selectbox("Crop Select Karein", ["Potato", "Tomato", "Corn"])
+        crop_name = st.selectbox("Crop Select Karein", ["Potato", "Tomato", "Corn"])
         file = st.file_uploader("Leaf ki photo upload karein", type=["jpg", "png", "jpeg"])
         btn = st.button("Start Analysis")
 
@@ -52,16 +51,13 @@ if choice == "AI Scanner":
             
             if btn:
                 with st.spinner('AI analysis kar raha hai...'):
-                    # Prediction logic
-                    diagnosis = predict_disease(crop, img)
+                    diagnosis = predict_disease(crop_name, img)
                     cure = CURE_GUIDE.get(diagnosis, "Data not available")
                     
-                    # Save to CSV
-                    new_data = pd.DataFrame([[datetime.date.today(), crop, diagnosis, "Verified"]], 
+                    new_data = pd.DataFrame([[datetime.date.today(), crop_name, diagnosis, "Verified"]], 
                                            columns=["Date", "Crop", "Diagnosis", "Status"])
                     new_data.to_csv(DB_FILE, mode='a', header=False, index=False)
                     
-                    # Display Result
                     st.subheader(f"Result: {diagnosis}")
                     if "Healthy" in diagnosis:
                         st.success(f"✅ {cure}")
@@ -73,9 +69,21 @@ if choice == "AI Scanner":
 elif choice == "Dashboard":
     st.title("👨‍🌾 Farm Overview")
     if os.path.exists(DB_FILE):
-        db = pd.read_csv(DB_FILE)
-        st.metric("Total Diagnoses", len(db))
-        st.line_chart(db.groupby('Date').count()['Crop'])
+        # Yahan se dhyan dein (Proper Indentation)
+        try:
+            db = pd.read_csv(DB_FILE)
+            if not db.empty:
+                st.metric("Total Diagnoses", len(db))
+                if 'Date' in db.columns and 'Crop' in db.columns:
+                    st.line_chart(db.groupby('Date').count()['Crop'])
+                else:
+                    st.info("Pehla scan karein taaki chart dikh sake!")
+            else:
+                st.info("Abhi tak koi data nahi hai. AI Scanner ka use karein!")
+        except Exception as e:
+            st.warning("Data file process ho rahi hai, kripya ek scan karein.")
+    else:
+        st.info("Data file nahi mili. Pehla scan AI Scanner se karein.")
 
 elif choice == "History":
     st.title("📂 All Records")
